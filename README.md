@@ -6,6 +6,8 @@ helloworld web app with maven and springmvc
 
 [完整代码][3]
 
+以后作为最基础的java web项目模板发展
+
 ## 从Maven模板创建web项目
 
 使用Maven的`maven-archetype-webapp`模板可以快速创建java web application. 命令行进入想要保存项目的目录下,执行以下命令:
@@ -249,6 +251,77 @@ web.xml 修改为JSP2.2 / Servlet 3.0使用的XSD
 2. 配置eclipse部署到web 容器
 3. 前面添加了maven tomcat plugin, 可以直接运行`mvn tomcat7:run`启动一个本项目的tomcat,查看效果,非常方便,开发阶段推荐
 
+
+## spring mvc基础
+
+本部分主要来自[spring mvc官方文档][4]
+
+### Spring MVC简介
+
+Spring MVC 框架围绕`DispatcherServlet`进行设计, 用于将请求转发到处理程序, 可以灵活配置处理程序,视图解析,locale, 时区,主题以及文件上传.
+
+默认请求处理程序基于`@Controller`和`@RequestMapping`注解, 提供了一系列灵活的处理方法. 在Spring3.0中`@Controller`通过`@PathVariable`支持RESTful网站的创建.
+
+Spring的视图解析非常灵活`Controller`通常负责准备Model和选择视图, 也可以直接发送结果.
+
+### DispatcherServlet
+
+`DispathcerServlet`是一个`Servlet`, 通过在web.xml中进行配置.
+
+```
+<web-app>
+    <servlet>
+        <servlet-name>example</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>example</servlet-name>
+        <url-pattern>/example/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>
+```
+
+在以上的配置中, 所有以`/example`开头的请求都会由名为`example`的`DispatcherServlet`实例处理
+
+配置好DispatcherServlet之后, 需要配置`WebApplicationContext`, 每一个DispatcherServlet都有它自己的WebApplicationContext, 继承root WebApplicationContext定义的所有bean. 这些继承bean可以被servlet scope的笨啊所覆盖.
+
+当`DispatcherServlet`实例化之后, Spring MVC会在`WEB-INF`目录下寻找`[servlet-name]-servlet.xml`配置文件,并创建里面定义的bean用于覆盖全局bean. 如前面的例子, 需要定义`/WEB-INF/example-servlet.xml`文件,其中包含所需bean.
+
+可以在只有一个DispatcherServlet的环境中只使用一个root context, 通过将`contextConfigLocation`设置为空:
+
+```
+<web-app>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/root-context.xml</param-value>
+    </context-param>
+    <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value></param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+</web-app>
+```
+
+### WebApplicationContext中的特殊Bean Type
+
+DispatcherServlet使用特殊bean处理请求并渲染视图.可以在WebApplicationContext中配置这些bean. 以下是
+
+[4]: http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html
 [3]: https://github.com/qiu-deqing/CounterWebApp
 [2]: http://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html
 [1]: http://www.mkyong.com/maven/how-to-create-a-web-application-project-with-maven/
