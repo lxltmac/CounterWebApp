@@ -319,7 +319,24 @@ Spring的视图解析非常灵活`Controller`通常负责准备Model和选择视
 
 ### WebApplicationContext中的特殊Bean Type
 
-DispatcherServlet使用特殊bean处理请求并渲染视图.可以在WebApplicationContext中配置这些bean. 以下是
+DispatcherServlet使用特殊bean处理请求并渲染视图.可以在WebApplicationContext中配置这些bean. 以下是Spring MVC自动使用的bean
+
+|---------------------------|---------------------------------------------|
+| HandlerMapping | 将请求映射到处理程序 |
+| HandlerAdapter |
+
+太枯燥,回头再写
+
+### DispatcherServlet默认配置
+
+`DispatcherServlet.properties`包含DispatcherServlet的默认bean配置, 配置自定义bean会替换掉默认bean.
+
+
+### DispatcherServlet处理流程
+
+设置好DispatcherServlet之后, 请求
+
+1.
 
 [4]: http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html
 [3]: https://github.com/qiu-deqing/CounterWebApp
