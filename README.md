@@ -334,9 +334,28 @@ DispatcherServlet使用特殊bean处理请求并渲染视图.可以在WebApplica
 
 ### DispatcherServlet处理流程
 
-设置好DispatcherServlet之后, 请求
+请求到达之后Spring MVC按照以下逻辑操作
 
-1.
+1. 搜索`WebApplicationContext`并且绑定到`DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE`, 在整个请求流程中控制器和其他元素都可以访问.
+2. locale解析器绑定到request,以支持locale的解析
+3. theme解析器绑定到request,以支持主题选择
+4. 如果制定了multipart文件解析器, 请求将会检测multiparts输入, 如果检测到这样的数据, 请求将被包裹到`MultipartHttpServletRequest`中已支持后续处理, 如文件上传.
+5. 搜索对应的handler. 如果找到了, 顺序执行handler相关的逻辑链(预处理, 后处理, 控制器)用于准备model或者render
+6. 如果handler返回了model, 将会执行视图渲染. 如果没有model返回, 视图将不会渲染.
+
+在处理过程中的异常将由`WebApplicationContext`中配置的异常解析器进行处理. 可以通过异常解析器自定义异常处理逻辑.
+
+`DispatcherServlet`也可以通过Servlet API返回**last-modification-date**.DispatcherServlet会查看handler是否实现`LastModified`接口. 如果实现了, `long getLastModified(request)`方法的返回值将返回给客户端.
+
+可以通过web.xml使用`init-param`自定义DispatcherServlet实例. 以下是支持的参数:
+
+- `ContextClass`:
+- `contextConfigLocation`:
+- `namespace`:
+
+## 实现Controller
+
+
 
 [4]: http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html
 [3]: https://github.com/qiu-deqing/CounterWebApp
