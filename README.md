@@ -355,6 +355,84 @@ DispatcherServlet使用特殊bean处理请求并渲染视图.可以在WebApplica
 
 ## 实现Controller
 
+controller接收用户输入并且准备反馈model, 使用`@RequestMapping`, `@RequestParam`,`@ModelAttribute`这样的注解实现Controller不需要继承特定基类或者实现特定接口:
+
+```
+@Controller
+public class HelloWorldController {
+
+  @RequestMapping("/helloWorld")
+  public String helloWorld(Model model) {
+    model.addAttribute("message", "Hello World!");
+    return "helloWorld";
+  }
+}
+```
+
+前面的方法接收一个`Model`作为参数并且返回`String`表示视图名, 也可以使用其他参数和返回值.
+
+### 使用@Controller定义控制器
+
+`@Controller`注解表示这个类扮演控制器的角色. Spring不强制继承任何基类.
+
+
+dispatcher搜寻带有这个注解的泪并且寻找它的`@RequestMapping`注解函数.
+
+
+### 使用`@RequestMapping`映射请求
+
+使用`@RequestMapping`将类似`/appointments`这样的URL指定特定的类或者方法进行处理, 通常来说类级别的注解将一个特定请求路径映射到**form controller**, 然后使用方法级别的注解指定不同的HTTP方法相应(如GET, POST), or an HTTP request parameter condition.
+
+```
+@Controller
+@RequestMapping("/appointments")
+public class AppointmentsController {
+
+  private final AppointmentBook appointmentBook;
+
+  @Autowired
+  public AppointmentsController(AppointmentBook appointmentBook) {
+    this.appointmentBook = appointmentBook;
+  }
+
+  @RequestMapping(method = RequestMethod.GET)
+  public Map<String, Appointment> get() {
+    return appointmentBook.getAppointmentsForToday();
+  }
+
+  @RequestMapping(value = "/{day}", method = RequestMethod.GET)
+  public Map<String, Appointment> getForDay(
+      @PathVariable @DateTimeFormat(iso=ISO.DATE) Date day,
+      Model model) {
+
+    return appointmentBook.getAppointmentsForDay(day);
+  }
+
+  @RequestMapping(value = "/new", method = RequestMethod.GET)
+  public AppointmentForm getNewForm() {
+    return new AppointmentForm();
+  }
+
+  @RequestMapping(method = RequestMethod.POST)
+  public String add(@Valid AppointmentForm appointment,
+      BindingResult result) {
+
+    if (result.hasErrors()) {
+      return "appointments/new";
+    }
+    appointmentBook.addAppointment(appointment);
+    return "redirect:/appointments";
+  }
+}
+```
+
+- 类级别的`@RequestMapping`表示这个控制器所有方法处理的请求都相对于`/appointments`路径
+- `get()`方法也有一个`@RequestMapping`指定它只处理GET请求, 也就是说HTTP GET请求`/appointments`会调用此方法处理
+- `add()`也具有同样的设置.
+- `getNewForm()`同时限制了HTTP方法和路径: 只有GET请求`/appointments/new`会调用此方法处理
+- `getForDay()`方法展示了**URI template**的用法(下一章介绍)
+-
+
 
 
 [4]: http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html
