@@ -430,9 +430,38 @@ public class AppointmentsController {
 - `get()`方法也有一个`@RequestMapping`指定它只处理GET请求, 也就是说HTTP GET请求`/appointments`会调用此方法处理
 - `add()`也具有同样的设置.
 - `getNewForm()`同时限制了HTTP方法和路径: 只有GET请求`/appointments/new`会调用此方法处理
-- `getForDay()`方法展示了**URI template**的用法(下一章介绍)
--
+- `getForDay()`方法展示了**URI template**的用法(下一节介绍)
+- 类级别的`@RequestMapping`不是必须的, **如果没有类级别的设置,所有路径都是绝对路径**.
 
+
+```
+@Controller
+public class ClinicController {
+
+  private final Clinic clinic;
+
+  @Autowired
+  pubic ClinicController(Clinic clinic) {
+    this.clinic = clinic;
+  }
+
+  @RequestMapping("/")
+  public void welcomeHandler() {
+  }
+
+  @RequestMapping("/vets")
+  public ModelMap vetsHandler() {
+    return new ModelMap(this.clinic.getVets());
+  }
+}
+```
+
+上面的例子中没有指定GET, POST方法,因为`@RequestMapping`默认相应所有方法,你也可以添加`@RequestMapping(method = RequestMethod.GET)`进一步设置.
+
+
+#### `@Controller`和AOP Proxying
+
+有时候controller需要使用AOP代理. 例如你为控制器设置了`@Transactional`, 这种情况下推荐使用基于类的代理.
 
 
 [4]: http://docs.spring.io/spring/docs/current/spring-framework-reference/html/mvc.html
